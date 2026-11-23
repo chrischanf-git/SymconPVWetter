@@ -1,0 +1,301 @@
+{
+  "elements": [
+    {
+      "type": "ExpansionPanel",
+      "caption": "Standort und Warnungen",
+      "items": [
+        {
+          "type": "ValidationTextBox",
+          "name": "DW_ORT",
+          "caption": "Ortsbezeichnung (auf allen Kacheln)"
+        },
+        {
+          "type": "NumberSpinner",
+          "name": "DW_LAT",
+          "caption": "Breitengrad",
+          "digits": 5,
+          "minimum": -90,
+          "maximum": 90
+        },
+        {
+          "type": "NumberSpinner",
+          "name": "DW_LON",
+          "caption": "Längengrad",
+          "digits": 5,
+          "minimum": -180,
+          "maximum": 180
+        },
+        {
+          "type": "NumberSpinner",
+          "name": "DW_HOEHE_M",
+          "caption": "Höhe des Standorts",
+          "suffix": "m"
+        },
+        {
+          "type": "ValidationTextBox",
+          "name": "DW_WARNCELL_ID",
+          "caption": "DWD-WarnCell-ID (Landkreis)"
+        },
+        {
+          "type": "ValidationTextBox",
+          "name": "DW_WARNGEBIET_NAME",
+          "caption": "Bezeichnung Warngebiet"
+        },
+        {
+          "type": "ValidationTextBox",
+          "name": "DW_STATION_MANUELL",
+          "caption": "MOSMIX-Station fest (leer = automatisch)"
+        },
+        {
+          "type": "ValidationTextBox",
+          "name": "DW_FALLBACK_STATION",
+          "caption": "MOSMIX-Ersatzstations-ID"
+        },
+        {
+          "type": "ValidationTextBox",
+          "name": "DW_FALLBACK_NAME",
+          "caption": "MOSMIX-Ersatzstationsname"
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "PV-Anlage",
+      "items": [
+        {
+          "type": "NumberSpinner",
+          "name": "DW_PV_KWP",
+          "caption": "Installierte PV-Modulleistung",
+          "digits": 2,
+          "minimum": 0.1,
+          "suffix": "kWp"
+        },
+        {
+          "type": "NumberSpinner",
+          "name": "DW_PV_TILT",
+          "caption": "Dachneigung",
+          "minimum": 0,
+          "maximum": 90,
+          "suffix": "°"
+        },
+        {
+          "type": "NumberSpinner",
+          "name": "DW_PV_AZIMUTH",
+          "caption": "Azimut: 0 = Süd, +90 = West, -90 = Ost",
+          "minimum": -180,
+          "maximum": 180,
+          "suffix": "°"
+        },
+        {
+          "type": "NumberSpinner",
+          "name": "DW_PV_PR",
+          "caption": "Performance Ratio",
+          "digits": 3,
+          "minimum": 0.01,
+          "maximum": 1
+        },
+        {
+          "type": "NumberSpinner",
+          "name": "DW_PV_AC_LIMIT_W",
+          "caption": "AC-Leistungsgrenze (0 = unbegrenzt)",
+          "minimum": 0,
+          "suffix": "W"
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "PV-Messvariablen und Lernen",
+      "items": [
+        {
+          "type": "SelectVariable",
+          "name": "DW_PV_ID_TAGESERTRAG",
+          "caption": "Variable Tagesertrag"
+        },
+        {
+          "type": "Select",
+          "name": "DW_PV_UNIT_TAGESERTRAG",
+          "caption": "Einheit Tagesertrag",
+          "options": [
+            {
+              "caption": "Wh",
+              "value": "Wh"
+            },
+            {
+              "caption": "kWh",
+              "value": "kWh"
+            }
+          ]
+        },
+        {
+          "type": "SelectVariable",
+          "name": "DW_PV_ID_GESAMTERTRAG",
+          "caption": "Variable Gesamtertrag"
+        },
+        {
+          "type": "Select",
+          "name": "DW_PV_UNIT_GESAMTERTRAG",
+          "caption": "Einheit Gesamtertrag",
+          "options": [
+            {
+              "caption": "Wh",
+              "value": "Wh"
+            },
+            {
+              "caption": "kWh",
+              "value": "kWh"
+            }
+          ]
+        },
+        {
+          "type": "SelectVariable",
+          "name": "DW_PV_ID_LEISTUNG",
+          "caption": "Variable aktuelle PV-Leistung"
+        },
+        {
+          "type": "Select",
+          "name": "DW_PV_UNIT_LEISTUNG",
+          "caption": "Einheit PV-Leistung",
+          "options": [
+            {
+              "caption": "W",
+              "value": "W"
+            },
+            {
+              "caption": "kW",
+              "value": "kW"
+            }
+          ]
+        },
+        {
+          "type": "NumberSpinner",
+          "name": "DW_PV_LERN_MIN_TAGE",
+          "caption": "Lernfunktion startet nach Tagen",
+          "minimum": 1
+        },
+        {
+          "type": "NumberSpinner",
+          "name": "DW_PV_HISTORIE_TAGE",
+          "caption": "Historie behalten",
+          "minimum": 7,
+          "suffix": "Tage"
+        },
+        {
+          "type": "NumberSpinner",
+          "name": "DW_PV_MESSINTERVALL_MIN",
+          "caption": "PV-Abtastung",
+          "minimum": 1,
+          "suffix": "Minuten"
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Modelldaten und Nutzung",
+      "items": [
+        {
+          "type": "CheckBox",
+          "name": "DW_OM_ENABLE",
+          "caption": "ICON-D2 und ECMWF ergänzend nutzen"
+        },
+        {
+          "type": "PasswordTextBox",
+          "name": "DW_OM_API_KEY",
+          "caption": "Open-Meteo API-Key (nur falls gebucht)"
+        },
+        {
+          "type": "CheckBox",
+          "name": "DW_OM_PRIVATE_USE_ONLY",
+          "caption": "Private, nichtkommerzielle Nutzung der freien Open-Meteo-API"
+        },
+        {
+          "type": "Label",
+          "caption": "Die freie Open-Meteo-API ist für nichtkommerzielle Nutzung vorgesehen. Für gewerbliche Nutzung einen passenden API-Zugang eintragen und die private Nutzung deaktivieren."
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Erweitert / Migration",
+      "items": [
+        {
+          "type": "NumberSpinner",
+          "name": "DW_MANUELL_MIN_ABSTAND_S",
+          "caption": "Mindestabstand manueller Abrufe",
+          "minimum": 0,
+          "suffix": "s"
+        },
+        {
+          "type": "NumberSpinner",
+          "name": "DW_HTTP_TIMEOUT_S",
+          "caption": "HTTP-Timeout",
+          "minimum": 3,
+          "maximum": 60,
+          "suffix": "s"
+        },
+        {
+          "type": "NumberSpinner",
+          "name": "DW_HTTP_RETRY_PAUSE_MS",
+          "caption": "Wartezeit vor Wiederholung",
+          "minimum": 0,
+          "maximum": 10000,
+          "suffix": "ms"
+        },
+        {
+          "type": "NumberSpinner",
+          "name": "DW_TAGE",
+          "caption": "7-Tage-Kachel: Tage",
+          "minimum": 1,
+          "maximum": 10
+        },
+        {
+          "type": "NumberSpinner",
+          "name": "DW_STUNDEN",
+          "caption": "Stunden im Wetterdiagramm",
+          "minimum": 12,
+          "maximum": 48
+        },
+        {
+          "type": "NumberSpinner",
+          "name": "DW_VISU_ID",
+          "caption": "Optionale Kachelvisualisierung-ID (derzeit nicht benötigt)",
+          "minimum": 0
+        },
+        {
+          "type": "SelectCategory",
+          "name": "LegacyCategoryID",
+          "caption": "Alte DWD-Kategorie (für einmaligen Import)"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Button",
+      "caption": "Wetterdaten jetzt abrufen",
+      "onClick": "echo DWDW_RequestRefresh($id) ? 'Abruf angefordert – die Kacheln werden aktualisiert.' : 'Abruf bereits aktiv oder Sperrfrist noch nicht vorbei.';"
+    },
+    {
+      "type": "Button",
+      "caption": "Alte Wetter- und PV-Lerndaten importieren",
+      "confirm": "Vor dem Import das alte Skript und dessen Ereignisse deaktivieren. Daten aus der gewählten alten Kategorie einmalig kopieren?",
+      "onClick": "echo 'Importierte Werte: ' . DWDW_ImportLegacy($id);"
+    },
+    {
+      "type": "Label",
+      "caption": "Alle sieben Kachelvariablen sowie die KNX-Stundenwerte werden unter dieser Instanz angelegt. Sie können wie gewohnt in der Kachelvisualisierung verknüpft werden."
+    }
+  ],
+  "status": [
+    {
+      "code": 102,
+      "icon": "active",
+      "caption": "Modul aktiv"
+    },
+    {
+      "code": 201,
+      "icon": "error",
+      "caption": "Konfiguration ungültig"
+    }
+  ]
+}

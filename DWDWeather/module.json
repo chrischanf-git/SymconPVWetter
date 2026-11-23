@@ -1,0 +1,15 @@
+{
+  "id": "{DF5C4C20-E66B-4F34-A8F2-53763884C119}",
+  "name": "DWDWeather",
+  "type": 3,
+  "vendor": "DWD Wetter PV",
+  "aliases": [
+    "DWD Wetter und PV",
+    "DWD MOSMIX Wetter PV"
+  ],
+  "url": "",
+  "parentRequirements": [],
+  "childRequirements": [],
+  "implemented": [],
+  "prefix": "DWDW"
+}

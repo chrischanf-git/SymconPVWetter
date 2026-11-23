@@ -1,0 +1,12 @@
+{
+  "id": "{9DB81317-6A7B-4729-95A8-63DF7C008E63}",
+  "author": "DWD Wetter PV Community",
+  "name": "DWD Weather PV",
+  "url": "",
+  "compatibility": {
+    "version": "8.1"
+  },
+  "version": "1.0.0",
+  "build": 1,
+  "date": 1795305600
+}
