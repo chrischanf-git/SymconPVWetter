@@ -14,49 +14,64 @@ class DWDWeather extends IPSModuleStrict
 
     private const PREFIX = 'DWDW';
 
-    private const PROPERTY_TYPES = ['DW_ORT'=>'String', 'DW_LAT'=>'Float', 'DW_LON'=>'Float', 'DW_HOEHE_M'=>'Integer', 'DW_WARNCELL_ID'=>'String', 'DW_WARNGEBIET_NAME'=>'String', 'DW_STATION_MANUELL'=>'String', 'DW_FALLBACK_STATION'=>'String', 'DW_FALLBACK_NAME'=>'String', 'DW_TAGE'=>'Integer', 'DW_STUNDEN'=>'Integer', 'DW_PV_KWP'=>'Float', 'DW_PV_TILT'=>'Integer', 'DW_PV_AZIMUTH'=>'Integer', 'DW_PV_PR'=>'Float', 'DW_PV_AC_LIMIT_W'=>'Integer', 'DW_VISU_ID'=>'Integer', 'DW_MANUELL_MIN_ABSTAND_S'=>'Integer', 'DW_HTTP_TIMEOUT_S'=>'Integer', 'DW_HTTP_RETRY_PAUSE_MS'=>'Integer', 'DW_OM_ENABLE'=>'Boolean', 'DW_OM_API_KEY'=>'String', 'DW_OM_PRIVATE_USE_ONLY'=>'Boolean', 'DW_PV_ID_TAGESERTRAG'=>'Integer', 'DW_PV_ID_GESAMTERTRAG'=>'Integer', 'DW_PV_ID_LEISTUNG'=>'Integer', 'DW_PV_UNIT_TAGESERTRAG'=>'String', 'DW_PV_UNIT_GESAMTERTRAG'=>'String', 'DW_PV_UNIT_LEISTUNG'=>'String', 'DW_PV_LERN_MIN_TAGE'=>'Integer', 'DW_PV_HISTORIE_TAGE'=>'Integer', 'DW_PV_MESSINTERVALL_MIN'=>'Integer'];
+    private const PROPERTY_TYPES = ['DW_MAP_LOCATION'=>'String', 'DW_ORT'=>'String', 'DW_LAT'=>'Float', 'DW_LON'=>'Float', 'DW_HOEHE_M'=>'Integer', 'DW_WARNCELL_ID'=>'String', 'DW_WARNGEBIET_NAME'=>'String', 'DW_STATION_MANUELL'=>'String', 'DW_FALLBACK_STATION'=>'String', 'DW_FALLBACK_NAME'=>'String', 'DW_TAGE'=>'Integer', 'DW_STUNDEN'=>'Integer', 'DW_PV_KWP'=>'Float', 'DW_PV_TILT'=>'Integer', 'DW_PV_AZIMUTH'=>'Integer', 'DW_PV_PR'=>'Float', 'DW_PV_AC_LIMIT_W'=>'Integer', 'DW_VISU_ID'=>'Integer', 'DW_MANUELL_MIN_ABSTAND_S'=>'Integer', 'DW_HTTP_TIMEOUT_S'=>'Integer', 'DW_HTTP_RETRY_PAUSE_MS'=>'Integer', 'DW_OM_ENABLE'=>'Boolean', 'DW_OM_API_KEY'=>'String', 'DW_OM_PRIVATE_USE_ONLY'=>'Boolean', 'DW_PV_ID_TAGESERTRAG'=>'Integer', 'DW_PV_ID_GESAMTERTRAG'=>'Integer', 'DW_PV_ID_LEISTUNG'=>'Integer', 'DW_PV_UNIT_TAGESERTRAG'=>'String', 'DW_PV_UNIT_GESAMTERTRAG'=>'String', 'DW_PV_UNIT_LEISTUNG'=>'String', 'DW_PV_LERN_MIN_TAGE'=>'Integer', 'DW_PV_HISTORIE_TAGE'=>'Integer', 'DW_PV_MESSINTERVALL_MIN'=>'Integer'];
+    // 0 in den erweiterten Feldern bedeutet: keine individuelle Vorgabe.
+    // Die Betriebswerte gelten intern, ohne die Instanzkonfiguration vorzubelegen.
+    private const INTERNAL_DEFAULTS = [
+        'DW_TAGE' => 7,
+        'DW_STUNDEN' => 24,
+        'DW_MANUELL_MIN_ABSTAND_S' => 90,
+        'DW_HTTP_TIMEOUT_S' => 20,
+        'DW_HTTP_RETRY_PAUSE_MS' => 1500,
+        'DW_PV_LERN_MIN_TAGE' => 5,
+        'DW_PV_HISTORIE_TAGE' => 120,
+        'DW_PV_MESSINTERVALL_MIN' => 5,
+    ];
     private array $ids = [];
 
     public function Create(): void
     {
         parent::Create();
-        $this->RegisterPropertyString('DW_ORT', 'Niederdorf / Erzgebirge (09366)');
-        $this->RegisterPropertyFloat('DW_LAT', 50.7242);
-        $this->RegisterPropertyFloat('DW_LON', 12.7834);
-        $this->RegisterPropertyInteger('DW_HOEHE_M', 400);
-        $this->RegisterPropertyString('DW_WARNCELL_ID', '114521000');
-        $this->RegisterPropertyString('DW_WARNGEBIET_NAME', 'Erzgebirgskreis');
+        $this->RegisterPropertyString('DW_MAP_LOCATION', '{"latitude":0,"longitude":0}');
+        $this->RegisterPropertyString('DW_ORT', '');
+        $this->RegisterPropertyFloat('DW_LAT', 0.0);
+        $this->RegisterPropertyFloat('DW_LON', 0.0);
+        $this->RegisterPropertyInteger('DW_HOEHE_M', 0);
+        $this->RegisterPropertyString('DW_WARNCELL_ID', '');
+        $this->RegisterPropertyString('DW_WARNGEBIET_NAME', '');
         $this->RegisterPropertyString('DW_STATION_MANUELL', '');
-        $this->RegisterPropertyString('DW_FALLBACK_STATION', '10577');
-        $this->RegisterPropertyString('DW_FALLBACK_NAME', 'Chemnitz');
-        $this->RegisterPropertyInteger('DW_TAGE', 7);
-        $this->RegisterPropertyInteger('DW_STUNDEN', 24);
-        $this->RegisterPropertyFloat('DW_PV_KWP', 22.5);
-        $this->RegisterPropertyInteger('DW_PV_TILT', 25);
-        $this->RegisterPropertyInteger('DW_PV_AZIMUTH', 20);
-        $this->RegisterPropertyFloat('DW_PV_PR', 0.82);
+        $this->RegisterPropertyString('DW_FALLBACK_STATION', '');
+        $this->RegisterPropertyString('DW_FALLBACK_NAME', '');
+        $this->RegisterPropertyInteger('DW_TAGE', 0);
+        $this->RegisterPropertyInteger('DW_STUNDEN', 0);
+        $this->RegisterPropertyFloat('DW_PV_KWP', 0.0);
+        $this->RegisterPropertyInteger('DW_PV_TILT', 0);
+        $this->RegisterPropertyInteger('DW_PV_AZIMUTH', 0);
+        $this->RegisterPropertyFloat('DW_PV_PR', 0.0);
         $this->RegisterPropertyInteger('DW_PV_AC_LIMIT_W', 0);
         $this->RegisterPropertyInteger('DW_VISU_ID', 0);
-        $this->RegisterPropertyInteger('DW_MANUELL_MIN_ABSTAND_S', 90);
-        $this->RegisterPropertyInteger('DW_HTTP_TIMEOUT_S', 20);
-        $this->RegisterPropertyInteger('DW_HTTP_RETRY_PAUSE_MS', 1500);
-        $this->RegisterPropertyBoolean('DW_OM_ENABLE', true);
+        $this->RegisterPropertyInteger('DW_MANUELL_MIN_ABSTAND_S', 0);
+        $this->RegisterPropertyInteger('DW_HTTP_TIMEOUT_S', 0);
+        $this->RegisterPropertyInteger('DW_HTTP_RETRY_PAUSE_MS', 0);
+        $this->RegisterPropertyBoolean('DW_OM_ENABLE', false);
         $this->RegisterPropertyString('DW_OM_API_KEY', '');
-        $this->RegisterPropertyBoolean('DW_OM_PRIVATE_USE_ONLY', true);
-        $this->RegisterPropertyInteger('DW_PV_ID_TAGESERTRAG', 16425);
-        $this->RegisterPropertyInteger('DW_PV_ID_GESAMTERTRAG', 49528);
-        $this->RegisterPropertyInteger('DW_PV_ID_LEISTUNG', 23727);
-        $this->RegisterPropertyString('DW_PV_UNIT_TAGESERTRAG', 'Wh');
-        $this->RegisterPropertyString('DW_PV_UNIT_GESAMTERTRAG', 'Wh');
-        $this->RegisterPropertyString('DW_PV_UNIT_LEISTUNG', 'W');
-        $this->RegisterPropertyInteger('DW_PV_LERN_MIN_TAGE', 5);
-        $this->RegisterPropertyInteger('DW_PV_HISTORIE_TAGE', 120);
-        $this->RegisterPropertyInteger('DW_PV_MESSINTERVALL_MIN', 5);
+        $this->RegisterPropertyBoolean('DW_OM_PRIVATE_USE_ONLY', false);
+        $this->RegisterPropertyInteger('DW_PV_ID_TAGESERTRAG', 0);
+        $this->RegisterPropertyInteger('DW_PV_ID_GESAMTERTRAG', 0);
+        $this->RegisterPropertyInteger('DW_PV_ID_LEISTUNG', 0);
+        $this->RegisterPropertyString('DW_PV_UNIT_TAGESERTRAG', '');
+        $this->RegisterPropertyString('DW_PV_UNIT_GESAMTERTRAG', '');
+        $this->RegisterPropertyString('DW_PV_UNIT_LEISTUNG', '');
+        $this->RegisterPropertyInteger('DW_PV_LERN_MIN_TAGE', 0);
+        $this->RegisterPropertyInteger('DW_PV_HISTORIE_TAGE', 0);
+        $this->RegisterPropertyInteger('DW_PV_MESSINTERVALL_MIN', 0);
         $this->RegisterPropertyInteger('LegacyCategoryID', 0);
         $this->RegisterAttributeString('ControlToken', '');
         $this->RegisterAttributeInteger('LastManual', 0);
         $this->RegisterAttributeString('ConfigFingerprint', '');
         $this->RegisterAttributeBoolean('LegacyImported', false);
+        $this->RegisterAttributeString('ResolvedMapLocation', '');
+        $this->RegisterAttributeString('ResolvedLocationSummary', '');
 
         $this->RegisterTimer('ForecastTimer', 0, 'DWDW_ForecastTick($_IPS[\'TARGET\']);');
         $this->RegisterTimer('WarningTimer', 0, 'DWDW_WarningTick($_IPS[\'TARGET\']);');
@@ -74,6 +89,7 @@ class DWDWeather extends IPSModuleStrict
             foreach (['ForecastTimer', 'WarningTimer', 'MeasureTimer', 'BootstrapTimer', 'ManualTimer'] as $timer) {
                 $this->SetTimerInterval($timer, 0);
             }
+            $this->invalidateAutomationOutputs();
             $this->SetStatus(201);
             return;
         }
@@ -106,15 +122,302 @@ class DWDWeather extends IPSModuleStrict
         $this->SetStatus(102);
     }
 
+    /**
+     * Kartenauswahl in der Konsole. Die Position kommt direkt aus dem
+     * SelectLocation-Feld (auch wenn das Formular noch nicht gespeichert wurde).
+     * Nur auf ausdruecklichen Klick: keine Geo-Abfragen im Hintergrundbetrieb.
+     *
+     * Rueckgabe ist eine Kurzmeldung fuer das Konfigurationsformular.
+     */
+    public function ResolveLocation(string $locationJson): string
+    {
+        $coords = self::decodeMapLocation($locationJson);
+        if ($coords === null) {
+            return 'Bitte zuerst auf der Karte einen gueltigen Standort auswaehlen.';
+        }
+        [$lat, $lon] = $coords;
+        $key = sprintf('%.5f,%.5f', $lat, $lon);
+        if ($this->ReadAttributeString('ResolvedMapLocation') === $key) {
+            return 'Standort bereits ermittelt: ' . $this->ReadAttributeString('ResolvedLocationSummary');
+        }
+        if (!IPS_SemaphoreEnter('DWDW_LOCATION_' . $this->InstanceID, 1000)) {
+            return 'Standortsuche laeuft bereits. Bitte spaeter erneut versuchen.';
+        }
+        try {
+            // Kein altes Warngebiet von einem anderen Standort uebernehmen.
+            $place = '';
+            $district = '';
+            $warning = null;
+            $height = null;
+            $notes = [];
+            try {
+                $reverse = $this->dwReverseLocation($lat, $lon);
+                $address = $reverse['address'] ?? [];
+                if (!is_array($address)) $address = [];
+                if (!in_array(strtolower((string)($address['country_code'] ?? '')), ['de'], true)) {
+                    $notes[] = 'DWD-Warnungen nur fuer Deutschland verfuegbar';
+                } else {
+                    $district = trim((string)($address['county'] ?? $address['state_district'] ?? ''));
+                    if ($district === '') {
+                        $district = trim((string)($address['city'] ?? ''));
+                        if ($district !== '') $district = 'Stadt ' . $district;
+                    }
+                    try {
+                        $warning = $this->dwFindWarnCellForDistrict($district);
+                    } catch (Throwable $e) {
+                        $notes[] = 'Warngebiet konnte nicht online ermittelt werden';
+                        $this->SendDebug('Standort/Warngebiet', $e->getMessage(), 0);
+                    }
+                }
+                $place = trim((string)($address['city'] ?? $address['town'] ?? $address['village']
+                    ?? $address['municipality'] ?? $address['hamlet'] ?? $address['suburb'] ?? ''));
+                $postal = trim((string)($address['postcode'] ?? ''));
+                if ($place !== '' && preg_match('/^\d{5}$/', $postal)) $place .= ' (' . $postal . ')';
+                if ($place === '') $notes[] = 'Ortsname muss noch kontrolliert werden';
+            } catch (Throwable $e) {
+                $notes[] = 'Ortsnamenssuche nicht erreichbar: bitte Ort manuell ergaenzen';
+                $this->SendDebug('Standort/Rueckwaertssuche', $e->getMessage(), 0);
+            }
+            // Die DWD-Stationshoehe ist eine NAeHERUNG; keine Punkt-Hoehenmessung.
+            try {
+                $height = $this->dwNearestStationHeight($lat, $lon);
+            } catch (Throwable $e) {
+                $notes[] = 'Standorthoehe nicht ermittelt (optional)';
+                $this->SendDebug('Standort/Hoehe', $e->getMessage(), 0);
+            }
+            // Zuerst Karte/Koordinaten sichern, dann ermittelte Standortdaten.
+            // Wenn Namens-/Warngebietserkennung scheitert, NICHT mit den
+            // Angaben der vorherigen Position weiterarbeiten.
+            IPS_SetProperty($this->InstanceID, 'DW_MAP_LOCATION', json_encode([
+                'latitude' => $lat, 'longitude' => $lon
+            ], JSON_THROW_ON_ERROR));
+            IPS_SetProperty($this->InstanceID, 'DW_LAT', $lat);
+            IPS_SetProperty($this->InstanceID, 'DW_LON', $lon);
+            IPS_SetProperty($this->InstanceID, 'DW_ORT', $place);
+            IPS_SetProperty($this->InstanceID, 'DW_WARNCELL_ID', $warning['id'] ?? '');
+            IPS_SetProperty($this->InstanceID, 'DW_WARNGEBIET_NAME', $warning['name'] ?? '');
+            IPS_SetProperty($this->InstanceID, 'DW_HOEHE_M', $height ?? 0);
+            // Ueberreste manueller Stationen koennen den neuen Standort stoeren.
+            IPS_SetProperty($this->InstanceID, 'DW_STATION_MANUELL', '');
+            IPS_SetProperty($this->InstanceID, 'DW_FALLBACK_STATION', '');
+            IPS_SetProperty($this->InstanceID, 'DW_FALLBACK_NAME', '');
+            $this->WriteAttributeString('ResolvedMapLocation', $key);
+            $summary = 'Karte: ' . $key . ' | Ort: ' . ($place ?: 'offen') .
+                ' | Warngebiet: ' . ($warning['name'] ?? 'manuell pruefen') .
+                ' | Hoehe: ' . ($height === null ? 'nicht ermittelt' : '~' . $height . ' m (Stationswert)');
+            if ($notes) $summary .= ' | Hinweise: ' . implode('; ', $notes);
+            $this->WriteAttributeString('ResolvedLocationSummary', $summary);
+            IPS_ApplyChanges($this->InstanceID);
+            return $summary . '. Formular bitte neu oeffnen und pruefen.';
+        } finally {
+            IPS_SemaphoreLeave('DWDW_LOCATION_' . $this->InstanceID);
+        }
+    }
+
+    /** Strikt validierte Symcon-SelectLocation-Koordinaten. */
+    public static function decodeMapLocation(string $json): ?array
+    {
+        $value = json_decode($json, true);
+        if (!is_array($value) || !isset($value['latitude'], $value['longitude']) ||
+            !is_numeric($value['latitude']) || !is_numeric($value['longitude'])) return null;
+        $lat = (float)$value['latitude'];
+        $lon = (float)$value['longitude'];
+        if (!is_finite($lat) || !is_finite($lon) || $lat <= -90 || $lat >= 90 ||
+            $lon <= -180 || $lon >= 180 || $lat == 0.0 || $lon == 0.0) return null;
+        return [round($lat, 6), round($lon, 6)];
+    }
+
+    /**
+     * Pro bewusstem Klick hoechstens EINE Reverse-Anfrage an Nominatim.
+     * Anbieterregel: max. 1 Anfrage/s pro Installation, eigener User-Agent,
+     * kein Autocomplete, keine periodischen Anfragen. OSM/ODbL-Attribution im Formular.
+     */
+    protected function dwReverseLocation(float $lat, float $lon): array
+    {
+        $url = 'https://nominatim.openstreetmap.org/reverse?' . http_build_query([
+            'format' => 'jsonv2', 'lat' => $lat, 'lon' => $lon,
+            'zoom' => 10, 'addressdetails' => 1, 'accept-language' => 'de'
+        ], '', '&', PHP_QUERY_RFC3986);
+        // Installationweit synchronisieren (auch ueber mehrere Modulinstanzen).
+        $path = sys_get_temp_dir() . '/dwdweather_nominatim_geocode.lock';
+        $handle = @fopen($path, 'c+');
+        if ($handle === false) throw new RuntimeException('Nominatim-Sperrdatei nicht anlegbar');
+        try {
+            if (!flock($handle, LOCK_EX)) throw new RuntimeException('Nominatim-Sperre nicht moeglich');
+            $content = stream_get_contents($handle);
+            $last = is_string($content) ? (float)trim($content) : 0.0;
+            $wait = 1.1 - (microtime(true) - $last);
+            if ($wait > 0) usleep((int)($wait * 1000000));
+            rewind($handle); ftruncate($handle, 0);
+            fwrite($handle, sprintf('%.6f', microtime(true)));
+            fflush($handle);
+        } finally {
+            flock($handle, LOCK_UN); fclose($handle);
+        }
+        $raw = $this->dwLocationHttp($url, 300000, true);
+        $json = json_decode($raw, true);
+        if (!is_array($json) || !isset($json['address']) || !is_array($json['address'])) {
+            throw new RuntimeException('Ortsdaten nicht lesbar');
+        }
+        return $json;
+    }
+
+    protected function dwLocationHttp(string $url, int $maxBytes, bool $nominatim = false): string
+    {
+        $agent = $nominatim
+            ? 'DWDWeather-IPSymcon/1.0.3 (IP-Symcon Standortauswahl; https://www.symcon.de)'
+            : 'DWDWeather-IPSymcon/1.0.3';
+        $ctx = stream_context_create(['http' => [
+            'method' => 'GET', 'timeout' => 8, 'ignore_errors' => false,
+            'header' => "User-Agent: {$agent}\r\nAccept: application/json,text/plain,*/*\r\n"
+        ], 'ssl' => ['verify_peer' => true, 'verify_peer_name' => true]]);
+        $raw = @file_get_contents($url, false, $ctx, 0, $maxBytes + 1);
+        if (!is_string($raw) || $raw === '' || strlen($raw) > $maxBytes) {
+            throw new RuntimeException('Standort-Webdienst nicht erreichbar oder Antwort ungueltig');
+        }
+        return $raw;
+    }
+
+    /** Warncell-ID nur setzen, wenn sie mit dem DWD-Gebiet eindeutig uebereinstimmt. */
+    protected function dwFindWarnCellForDistrict(string $district): ?array
+    {
+        if ($district === '') return null;
+        // OFFLINE-Fallback fuer eindeutig benannte, amtliche sächsische Warnkreise.
+        $known = [
+            'erzgebirgskreis' => ['id' => '114521000', 'name' => 'Erzgebirgskreis'],
+            'stadt chemnitz' => ['id' => '114511000', 'name' => 'Stadt Chemnitz'],
+            'stadt dresden' => ['id' => '114612000', 'name' => 'Stadt Dresden'],
+            'stadt leipzig' => ['id' => '114713000', 'name' => 'Stadt Leipzig'],
+            'kreis leipzig' => ['id' => '114729000', 'name' => 'Kreis Leipzig'],
+            'kreis meissen' => ['id' => '114627000', 'name' => 'Kreis Meißen'],
+        ];
+        $key = self::dwNormalizeCounty($district);
+        if (isset($known[$key])) return $known[$key];
+        // DWD-Verzeichnis enthielt alle WarncellIDs; CSV-Spalten variieren ueber Versionen.
+        $url = 'https://www.dwd.de/DE/leistungen/opendata/help/warnungen/cap_warncellids_csv.csv';
+        $csv = $this->dwLocationHttp($url, 4000000);
+        return self::dwWarnCellFromCsv($csv, $district);
+    }
+
+    public static function dwNormalizeCounty(string $name): string
+    {
+        // Kein mbstring erforderlich; Umlaute vor ASCII-Kleinschreibung umsetzen.
+        $name = trim(strtr($name, [
+            'Ä'=>'Ae', 'Ö'=>'Oe', 'Ü'=>'Ue', 'ẞ'=>'Ss',
+            'ä'=>'ae', 'ö'=>'oe', 'ü'=>'ue', 'ß'=>'ss'
+        ]));
+        $name = strtolower($name);
+        $name = preg_replace('/\s*\([^)]*\)/u', '', $name);
+        $name = preg_replace('/[^a-z0-9]+/', ' ', $name);
+        return trim((string)$name);
+    }
+
+    /** Offizielle DWD-Liste: bei mehrdeutigen Kreisteilen KEINE automatische Entwarnung. */
+    public static function dwWarnCellFromCsv(string $csv, string $district): ?array
+    {
+        $target = self::dwNormalizeCounty($district);
+        if ($target === '') return null;
+        $found = [];
+        foreach (preg_split('/\R/', $csv) as $line) {
+            if (strlen($line) > 1000) continue;
+            $separator = substr_count($line, ';') >= 1 ? ';' :
+                (substr_count($line, "\t") >= 1 ? "\t" : ',');
+            $fields = str_getcsv($line, $separator);
+            $id = '';
+            foreach ($fields as $field) {
+                if (preg_match('/^(?:1|9)\d{8}$/', trim($field))) {
+                    $id = trim($field);
+                    break;
+                }
+            }
+            if ($id === '') continue;
+            foreach ($fields as $field) {
+                $name = trim($field);
+                if ($name === '' || preg_match('/^\d+$/', $name)) continue;
+                if (self::dwNormalizeCounty($name) === $target) {
+                    $found[$id] = ['id' => $id, 'name' => $name];
+                    break;
+                }
+            }
+        }
+        // Landkreis-Unterteilungen oder Namensgleichheiten: manuell pruefen.
+        return count($found) === 1 ? reset($found) : null;
+    }
+
+    /** Naechste MOSMIX-Kataloghoehe (nur grobe Naeherung fuer die Kartenposition). */
+    protected function dwNearestStationHeight(float $lat, float $lon): ?int
+    {
+        $catalog = $this->dwLocationHttp(
+            'https://www.dwd.de/DE/leistungen/met_verfahren_mosmix/mosmix_stationskatalog.cfg?view=nasPublication&nn=16102',
+            1200000
+        );
+        $nearestKm = INF;
+        $height = null;
+        foreach (preg_split('/\R/', $catalog) as $line) {
+            $cols = preg_split('/\s+/', trim($line));
+            if (count($cols) < 6 || !preg_match('/^[A-Za-z0-9]{4,7}$/', $cols[0])) continue;
+            $n = count($cols);
+            $y = $this->dwDegreesMinutes($cols[$n - 3]);
+            $x = $this->dwDegreesMinutes($cols[$n - 2]);
+            $h = is_numeric($cols[$n - 1]) ? (int)$cols[$n - 1] : null;
+            if ($x === null || $y === null || $h === null) continue;
+            $distance = $this->dwKm($lat, $lon, $y, $x);
+            if ($distance < $nearestKm) {
+                $nearestKm = $distance;
+                $height = $h;
+            }
+        }
+        return $nearestKm <= 50.0 ? $height : null;
+    }
+
     private function configurationValid(): bool
     {
         $lat = (float)$this->setting('DW_LAT');
         $lon = (float)$this->setting('DW_LON');
-        return $lat >= -90 && $lat <= 90 && $lon >= -180 && $lon <= 180
-            && $this->setting('DW_PV_KWP') > 0
+        $kwp = (float)$this->setting('DW_PV_KWP');
+        $pr = (float)$this->setting('DW_PV_PR');
+        return trim((string)$this->setting('DW_ORT')) !== ''
+            && is_finite($lat) && $lat >= -90 && $lat <= 90 && $lat != 0.0
+            && is_finite($lon) && $lon >= -180 && $lon <= 180 && $lon != 0.0
+            && trim((string)$this->setting('DW_WARNCELL_ID')) !== ''
+            && trim((string)$this->setting('DW_WARNGEBIET_NAME')) !== ''
+            && is_finite($kwp) && $kwp > 0
             && $this->setting('DW_PV_TILT') >= 0 && $this->setting('DW_PV_TILT') <= 90
-            && $this->setting('DW_PV_PR') > 0 && $this->setting('DW_PV_PR') <= 1
-            && $this->setting('DW_HTTP_TIMEOUT_S') > 0;
+            && $this->setting('DW_PV_AZIMUTH') >= -180 && $this->setting('DW_PV_AZIMUTH') <= 180
+            && is_finite($pr) && $pr > 0 && $pr <= 1
+            && (int)$this->setting('DW_PV_ID_TAGESERTRAG') > 0
+            && (int)$this->setting('DW_PV_ID_GESAMTERTRAG') > 0
+            && (int)$this->setting('DW_PV_ID_LEISTUNG') > 0
+            && in_array($this->setting('DW_PV_UNIT_TAGESERTRAG'), ['Wh','kWh'], true)
+            && in_array($this->setting('DW_PV_UNIT_GESAMTERTRAG'), ['Wh','kWh'], true)
+            && in_array($this->setting('DW_PV_UNIT_LEISTUNG'), ['W','kW'], true);
+    }
+
+    private function invalidateAutomationOutputs(): void
+    {
+        // Bestehende Instanz: bei unvollstaendiger Konfiguration ALTE Freigaben sperren.
+        // Keine Caches und insbesondere keine Lerndaten loeschen.
+        $invalid = [
+            'DWD_PV_LEISTUNG_24H_VALID' => false,
+            'DWD_PV_VALID' => false,
+            'DWD_PV_7D_VALID' => false,
+            'DWD_PV_MORGEN_VALID' => false,
+            'DWD_PV_HEUTE_ERWARTET_VALID' => false,
+            'DWD_WARN_VALID' => false,
+            'DWD_PV_24H_QUALITAET' => 0,
+            'DWD_PV_24H_QUALITAET_TEXT' => 'Instanz noch nicht vollstaendig konfiguriert',
+        ];
+        foreach ($invalid as $ident => $value) {
+            $id = @IPS_GetObjectIDByIdent($ident, $this->InstanceID);
+            if ($id !== false) $this->dwSetIfDifferent((int)$id, $value);
+        }
+        $hourCat = @IPS_GetObjectIDByIdent('DWD_PV_24_STUNDENWERTE', $this->InstanceID);
+        if ($hourCat !== false) {
+            for ($i = 1; $i <= 24; $i++) {
+                $hourID = @IPS_GetObjectIDByIdent(sprintf('DWD_PV_LEISTUNG_H%02d_W', $i), $hourCat);
+                if ($hourID !== false) $this->dwSetIfDifferent((int)$hourID, 0);
+            }
+        }
     }
 
     /** Alle Wetterparameter sind Instanz-Eigenschaften, keine globalen PHP-Konstanten. */
@@ -125,7 +428,11 @@ class DWDWeather extends IPSModuleStrict
         }
         $type = self::PROPERTY_TYPES[$name];
         $method = 'ReadProperty' . $type;
-        return $this->{$method}($name);
+        $value = $this->{$method}($name);
+        if (isset(self::INTERNAL_DEFAULTS[$name]) && $value === 0) {
+            return self::INTERNAL_DEFAULTS[$name];
+        }
+        return $value;
     }
 
     private function dwVar(int $parent, string $ident, string $name, int $type,
@@ -312,6 +619,7 @@ class DWDWeather extends IPSModuleStrict
     /** Von der Konsole/aus PHP aufrufbar: DWDW_RequestRefresh($InstanzID). */
     public function RequestRefresh(): bool
     {
+        if (!$this->configurationValid()) return false;
         if (!IPS_SemaphoreEnter('DWDW_MANUAL_' . $this->InstanceID, 1000)) {
             return false;
         }
@@ -352,6 +660,11 @@ class DWDWeather extends IPSModuleStrict
     /** Mehrere Instanzen duerfen parallel laufen, jedoch nicht dieselbe Instanz mehrfach. */
     private function runCycle(string $mode): void
     {
+        if (!$this->configurationValid()) {
+            $this->invalidateAutomationOutputs();
+            $this->SetStatus(201);
+            return;
+        }
         if (!in_array($mode, ['all','forecast','warn','measure','manual'], true)) {
             return;
         }

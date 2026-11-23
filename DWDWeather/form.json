@@ -1,9 +1,36 @@
 {
   "elements": [
     {
+      "type": "Label",
+      "caption": "Neue Instanzen beginnen ohne Standort- oder PV-Vorgaben. Standort auf Karte waehlen und ermitteln lassen; danach PV-Parameter und Messvariablen eintragen."
+    },
+    {
       "type": "ExpansionPanel",
       "caption": "Standort und Warnungen",
       "items": [
+        {
+          "type": "Label",
+          "caption": "Standort auf der Karte waehlen und danach \"Standort aus Karte uebernehmen\" anklicken. Ort, Koordinaten und DWD-Warngebiet werden soweit moeglich automatisch ermittelt."
+        },
+        {
+          "type": "SelectLocation",
+          "name": "DW_MAP_LOCATION",
+          "caption": "Standort auf Karte auswaehlen",
+          "width": "100%"
+        },
+        {
+          "type": "Button",
+          "caption": "Standort aus Karte uebernehmen und Daten ermitteln",
+          "onClick": "echo DWDW_ResolveLocation($id, (string)$DW_MAP_LOCATION);"
+        },
+        {
+          "type": "Label",
+          "caption": "Ortsdaten: OpenStreetMap/Nominatim (einmalig bei Klick, kein Autocomplete; © OpenStreetMap-Mitwirkende / ODbL). Warngebietszuordnung ohne Garantie; bitte pruefen. Stationshoehe = grobe Naeherung."
+        },
+        {
+          "type": "Label",
+          "caption": "Die folgenden Felder dienen zur Kontrolle oder manuellen Korrektur. Unklare DWD-Warngebiete bleiben bewusst leer, statt faelschlich \"Keine Warnungen\" anzuzeigen."
+        },
         {
           "type": "ValidationTextBox",
           "name": "DW_ORT",
@@ -28,7 +55,7 @@
         {
           "type": "NumberSpinner",
           "name": "DW_HOEHE_M",
-          "caption": "Höhe des Standorts",
+          "caption": "Hoehe (aus MOSMIX-Stationshoehe nur angenaehert; bitte pruefen)",
           "suffix": "m"
         },
         {
@@ -67,7 +94,7 @@
           "name": "DW_PV_KWP",
           "caption": "Installierte PV-Modulleistung",
           "digits": 2,
-          "minimum": 0.1,
+          "minimum": 0,
           "suffix": "kWp"
         },
         {
@@ -91,7 +118,7 @@
           "name": "DW_PV_PR",
           "caption": "Performance Ratio",
           "digits": 3,
-          "minimum": 0.01,
+          "minimum": 0,
           "maximum": 1
         },
         {
@@ -118,6 +145,10 @@
           "caption": "Einheit Tagesertrag",
           "options": [
             {
+              "caption": "Bitte Einheit waehlen",
+              "value": ""
+            },
+            {
               "caption": "Wh",
               "value": "Wh"
             },
@@ -137,6 +168,10 @@
           "name": "DW_PV_UNIT_GESAMTERTRAG",
           "caption": "Einheit Gesamtertrag",
           "options": [
+            {
+              "caption": "Bitte Einheit waehlen",
+              "value": ""
+            },
             {
               "caption": "Wh",
               "value": "Wh"
@@ -158,6 +193,10 @@
           "caption": "Einheit PV-Leistung",
           "options": [
             {
+              "caption": "Bitte Einheit waehlen",
+              "value": ""
+            },
+            {
               "caption": "W",
               "value": "W"
             },
@@ -170,21 +209,21 @@
         {
           "type": "NumberSpinner",
           "name": "DW_PV_LERN_MIN_TAGE",
-          "caption": "Lernfunktion startet nach Tagen",
-          "minimum": 1
+          "caption": "Lernfunktion startet nach Tagen (0 = interner Standard)",
+          "minimum": 0
         },
         {
           "type": "NumberSpinner",
           "name": "DW_PV_HISTORIE_TAGE",
-          "caption": "Historie behalten",
-          "minimum": 7,
+          "caption": "Historie behalten (0 = interner Standard)",
+          "minimum": 0,
           "suffix": "Tage"
         },
         {
           "type": "NumberSpinner",
           "name": "DW_PV_MESSINTERVALL_MIN",
-          "caption": "PV-Abtastung",
-          "minimum": 1,
+          "caption": "PV-Abtastung (0 = interner Standard)",
+          "minimum": 0,
           "suffix": "Minuten"
         }
       ]
@@ -196,7 +235,7 @@
         {
           "type": "CheckBox",
           "name": "DW_OM_ENABLE",
-          "caption": "ICON-D2 und ECMWF ergänzend nutzen"
+          "caption": "ICON-D2 und ECMWF ergänzend nutzen (aktivieren nur bei erlaubter API-Nutzung)"
         },
         {
           "type": "PasswordTextBox",
@@ -221,22 +260,22 @@
         {
           "type": "NumberSpinner",
           "name": "DW_MANUELL_MIN_ABSTAND_S",
-          "caption": "Mindestabstand manueller Abrufe",
+          "caption": "Mindestabstand manueller Abrufe (0 = interner Standard)",
           "minimum": 0,
           "suffix": "s"
         },
         {
           "type": "NumberSpinner",
           "name": "DW_HTTP_TIMEOUT_S",
-          "caption": "HTTP-Timeout",
-          "minimum": 3,
+          "caption": "HTTP-Timeout (0 = interner Standard)",
+          "minimum": 0,
           "maximum": 60,
           "suffix": "s"
         },
         {
           "type": "NumberSpinner",
           "name": "DW_HTTP_RETRY_PAUSE_MS",
-          "caption": "Wartezeit vor Wiederholung",
+          "caption": "Wartezeit vor Wiederholung (0 = interner Standard)",
           "minimum": 0,
           "maximum": 10000,
           "suffix": "ms"
@@ -244,15 +283,15 @@
         {
           "type": "NumberSpinner",
           "name": "DW_TAGE",
-          "caption": "7-Tage-Kachel: Tage",
-          "minimum": 1,
+          "caption": "7-Tage-Kachel: Tage (0 = interner Standard)",
+          "minimum": 0,
           "maximum": 10
         },
         {
           "type": "NumberSpinner",
           "name": "DW_STUNDEN",
-          "caption": "Stunden im Wetterdiagramm",
-          "minimum": 12,
+          "caption": "Stunden im Wetterdiagramm (0 = interner Standard)",
+          "minimum": 0,
           "maximum": 48
         },
         {
@@ -273,7 +312,7 @@
     {
       "type": "Button",
       "caption": "Wetterdaten jetzt abrufen",
-      "onClick": "echo DWDW_RequestRefresh($id) ? 'Abruf angefordert – die Kacheln werden aktualisiert.' : 'Abruf bereits aktiv oder Sperrfrist noch nicht vorbei.';"
+      "onClick": "echo DWDW_RequestRefresh($id) ? 'Abruf angefordert – die Kacheln werden aktualisiert.' : 'Abruf nicht möglich: Konfiguration unvollständig, Abruf bereits aktiv oder Sperrfrist noch nicht vorbei.';"
     },
     {
       "type": "Button",
@@ -295,7 +334,7 @@
     {
       "code": 201,
       "icon": "error",
-      "caption": "Konfiguration ungültig"
+      "caption": "Bitte Standort, Warngebiet und PV-Werte vollständig konfigurieren"
     }
   ]
 }

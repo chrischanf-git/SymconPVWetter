@@ -15,7 +15,47 @@ foreach ([16425 => [2, 16500.0],49528 => [2, 58000.0],23727 => [1, 3400]] as $id
     $GLOBALS['mockValues'][$id]=$value;
 }
 $mod = new DWDWeather(9001);
-must($mod->status===102,'Modul aktiv');
+// Neue Instanzen duerfen keinerlei personen- oder anlagenspezifische Werte haben.
+$emptyFields = [
+    'DW_ORT'=>'', 'DW_LAT'=>0.0, 'DW_LON'=>0.0, 'DW_HOEHE_M'=>0,
+    'DW_WARNCELL_ID'=>'', 'DW_WARNGEBIET_NAME'=>'', 'DW_FALLBACK_STATION'=>'',
+    'DW_FALLBACK_NAME'=>'', 'DW_PV_KWP'=>0.0, 'DW_PV_TILT'=>0,
+    'DW_PV_AZIMUTH'=>0, 'DW_PV_PR'=>0.0,
+    'DW_PV_ID_TAGESERTRAG'=>0, 'DW_PV_ID_GESAMTERTRAG'=>0,
+    'DW_PV_ID_LEISTUNG'=>0, 'DW_PV_UNIT_TAGESERTRAG'=>'',
+    'DW_PV_UNIT_GESAMTERTRAG'=>'', 'DW_PV_UNIT_LEISTUNG'=>'',
+    'DW_OM_ENABLE'=>false, 'DW_OM_PRIVATE_USE_ONLY'=>false,
+    'DW_HTTP_TIMEOUT_S'=>0, 'DW_PV_LERN_MIN_TAGE'=>0,
+];
+foreach ($emptyFields as $key=>$default) {
+    must((new ReflectionProperty(IPSModuleStrict::class, 'properties'))->getValue($mod)[$key] === $default, 'Neue Instanz ohne Vorgabe: '.$key);
+}
+must($mod->status===201,'Frische Instanz ohne Pflichtdaten inaktiv');
+foreach ($mod->timers as $name=>$timer) {
+    must($timer['interval']===0,'Unvollstaendig: Timer deaktiviert: '.$name);
+}
+must(!$mod->RequestRefresh(),'Kein manueller Abruf ohne Konfiguration');
+must(IPS_GetObjectIDByIdent('DWD_KACHEL_7T', 9001)===false,'Ohne Konfiguration keine Kacheln');
+$required = [
+    'DW_ORT'=>'Niederdorf / Erzgebirge (09366)', 'DW_LAT'=>50.7242, 'DW_LON'=>12.7834,
+    'DW_HOEHE_M'=>400, 'DW_WARNCELL_ID'=>'114521000',
+    'DW_WARNGEBIET_NAME'=>'Erzgebirgskreis', 'DW_FALLBACK_STATION'=>'10577',
+    'DW_FALLBACK_NAME'=>'Chemnitz', 'DW_PV_KWP'=>22.5, 'DW_PV_TILT'=>25,
+    'DW_PV_AZIMUTH'=>20, 'DW_PV_PR'=>0.82,
+    'DW_PV_ID_TAGESERTRAG'=>16425, 'DW_PV_ID_GESAMTERTRAG'=>49528,
+    'DW_PV_ID_LEISTUNG'=>23727, 'DW_PV_UNIT_TAGESERTRAG'=>'Wh',
+    'DW_PV_UNIT_GESAMTERTRAG'=>'Wh', 'DW_PV_UNIT_LEISTUNG'=>'W',
+    'DW_OM_ENABLE'=>true, 'DW_OM_PRIVATE_USE_ONLY'=>true,
+];
+foreach ($required as $key=>$value) $mod->SetTestProperty($key,$value);
+$mod->ApplyChanges();
+must($mod->status===102,'Modul nach vollstaendiger Eingabe aktiv');
+// 0 in erweiterten Eingaben wird erst intern zu sicheren Betriebswerten.
+$setting = new ReflectionMethod($mod, 'setting');
+must($setting->invoke($mod,'DW_HTTP_TIMEOUT_S')===20,'Ohne Technikvorgabe: HTTP-Timeout 20s intern');
+must($setting->invoke($mod,'DW_TAGE')===7,'Ohne Technikvorgabe: Sieben Tage intern');
+must($setting->invoke($mod,'DW_PV_MESSINTERVALL_MIN')===5,'Ohne Technikvorgabe: PV-Intervall intern');
+
 must(count($mod->hooks)===1,'Eindeutiger Hook');
 must(count($mod->timers)===5,'Fuenf Module-Timer');
 must($mod->GetIDForIdent('DWD_KACHEL_7T')>0,'7-Tage-HTML-Variable erstellt');
@@ -71,6 +111,7 @@ ob_start(); $hook->invoke($mod); $unauthorized=ob_get_clean();
 must(str_contains($unauthorized,'nicht autorisiert'),'Unberechtigter POST abgewiesen');
 // Neue Instanz darf eigenstaendige Werte haben.
 $second = new DWDWeather(9002);
+foreach ($required as $key=>$value) $second->SetTestProperty($key,$value);
 $second->SetTestProperty('DW_ORT','Chemnitz Test');
 $second->SetTestProperty('DW_PV_KWP',5.5);
 $second->ApplyChanges();
@@ -78,6 +119,15 @@ $second->MeasureTick();
 must(str_contains((string)GetValue($second->GetIDForIdent('DWD_KACHEL_7T')),'Chemnitz Test'),'Neue Instanz eigene Ortseinstellung');
 must(str_contains((string)GetValue($second->GetIDForIdent('DWD_KACHEL_PV')),'5,5 kWp'),'Neue Instanz eigene PV-Einstellung');
 must(!str_contains((string)GetValue($mod->GetIDForIdent('DWD_KACHEL_PV')),'5,5 kWp'),'Erste Instanz unveraendert');
+$mod->SetTestProperty('DW_ORT', '');
+$mod->ApplyChanges();
+must($mod->status===201, 'Ein bereits aktives Modul wird bei entfernten Pflichtfeldern inaktiv');
+must(GetValue($mod->GetIDForIdent('DWD_PV_LEISTUNG_24H_VALID'))===false, 'Nach Loeschen Pflichtfeld keine Freigabe alter PV-Daten');
+must(GetValue($mod->GetIDForIdent('DWD_PV_24H_QUALITAET'))===0, 'Nach Loeschen Pflichtfeld Qualitaet 0');
+$mod->SetTestProperty('DW_ORT', $required['DW_ORT']);
+$mod->ApplyChanges();
+must($mod->status===102,'Bestehende Instanz nach Rueckkehr gueltiger Konfiguration aktiv');
+
 // Einmaliger Cache-/Lerndatenimport ohne Mutation der alten Objekte.
 $oldCat=IPS_CreateCategory();
 foreach (['DWD_PV_IST_STATE_JSON' => '{"days":{"2026-11-20":{"actual":12}}}', 'DWD_STATION_ID'=>'O013'] as $ident=>$value) {

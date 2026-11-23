@@ -23,19 +23,24 @@ Alle Kacheln verwenden Schwarz/Dunkelgrau und kleinere Eckradien; Wetterwarnunge
 3. Änderungen auf dem Branch `main` committen. Eine ZIP-Datei **als einzelnes Repository-Asset** einzustellen genügt *nicht*; IP-Symcon braucht die Verzeichnisstruktur im Repository.
 4. In IP-Symcon die **Konsole → Kern-Instanzen → Modules (Module Control)** öffnen. Mit **+** die URL des Repositories hinzufügen, etwa `https://github.com/DEIN-NAME/symcon-dwd-weather-pv`.
 5. Über **Instanz hinzufügen** eine neue Geräteinstanz **`DWDWeather`** (Hersteller `DWD Wetter PV`) erstellen.
-6. Die neue Instanz öffnen. Die Einstellungen für Standort, PV-Anlage und Messvariablen kontrollieren und **Übernehmen**. Es werden sieben Statusvariablen für Kacheln, Mess-/Prognosewerte und eine Unterkategorie mit 24 Stundenwerten angelegt.
+6. Neue Instanz öffnen. Sie enthält **keine Standort-, PV- oder Messvariablen-Vorgaben**. Unter **Standort und Warnungen** auf **Standort auf Karte auswählen** klicken, den Ort markieren, dann **Standort aus Karte übernehmen und Daten ermitteln** anklicken. Die Suche läuft **nur nach dem Button-Klick**, nicht zyklisch. Anschließend das Formular neu öffnen, Ort, Koordinaten, Warngebiet und ungefähre Höhe kontrollieren. Wenn die Warnregion nicht eindeutig bestimmt werden konnte, die DWD-WarnCell-ID **manuell** ergänzen. Dann PV-Leistung, Neigung, Ausrichtung, PR, Messvariablen und Einheiten ausfüllen und **Übernehmen**. Erst dann werden sieben Statusvariablen für Kacheln, Mess-/Prognosewerte und eine Unterkategorie mit 24 Stundenwerten angelegt.
 7. Die neuen HTML-Variablen `DWD_KACHEL_*` in der Kachelvisualisierung einbinden. Im Formular oder in Kachel 05 auf „Wetterdaten jetzt abrufen“ klicken. Der erste Abruf kann wegen der DWD-KMZ-Downloads etwas dauern.
 
-### Voreinstellungen im Paket
+### Ersteinrichtung ohne voreingetragene Werte (ab V1.0.3)
 
-- Wetterstandort **Niederdorf / Erzgebirge (09366)**; Koordinaten 50.7242 / 12.7834, Höhe 400 m
-- DWD-Warngebiet **Erzgebirgskreis** (WarnCell-ID `114521000`)
-- PV **22,5 kWp**, 25° Dachneigung, Azimut **+20° ab Süd**, PR 0,82
-- Quellvariablen: Tagesertrag **16425** (Wh), Gesamtertrag **49528** (Wh), PV-Momentanleistung **23727** (W)
+**Neue Instanzen** haben keine vorgegebenen Standortdaten, Koordinaten, DWD-Warngebiet-ID, PV-Anlagenparameter, Messvariablen-IDs, Einheiten oder Zustimmungen zur API-Nutzung. Eine neue Instanz befindet sich zunaechst im Status **Konfiguration unvollstaendig (201)**. Die Timer bleiben bis zur vollstaendigen Einrichtung ausgeschaltet, und es werden keine Prognosewerte freigegeben.
 
-Diese Werte stammen aus der zuletzt verwendeten Skriptkonfiguration und sind **in der Modulinstanz frei änderbar**. Für andere Anlagen bitte vollständig anpassen; die Variablen-IDs sind für jede Symcon-Installation verschieden.
+**Pflichtangaben:** Ortsbezeichnung; Breitengrad und Laengengrad; DWD-WarnCell-ID und Warngebietsname; PV-kWp und Performance Ratio; drei Messvariablen und deren Einheiten. Dachneigung und Azimut koennen legitim 0 sein (Flachdach/Suedausrichtung). Die Hoehe, MOSMIX-Ersatzstation und das AC-Limit sind optional. Eine MOSMIX-Station wird automatisch bestimmt, wenn das Stationsfeld leer bleibt.
 
-**Standortwechsel:** `DW_ORT` ändert ausschließlich die angezeigte Bezeichnung. Für einen echten Standortwechsel `DW_LAT`, `DW_LON`, `DW_HOEHE_M` und ggf. `DW_WARNCELL_ID`/`DW_WARNGEBIET_NAME` anpassen. Die Eingabe einer PLZ allein löst derzeit **keine** Geocodierung aus.
+**Technische Besonderheit von IP-Symcon:** `NumberSpinner`-Felder koennen keinen wirklich leeren numerischen Standardwert anzeigen. Dort steht deshalb **0 = noch keine individuelle Eingabe**. In den erweiterten Einstellungen gelten bei 0 *intern* die sicheren Betriebswerte (z.B. 7 Tage, 24 Stunden, 20 s HTTP-Timeout, 90 s manuelle Sperrfrist und 5 min Messintervall). Diese werden nicht als persoenliche Anlagenwerte in der Instanz hinterlegt. Checkboxen sind nicht markiert. Die Einheitenauswahl beginnt bei „Bitte Einheit waehlen“.
+
+**Open-Meteo:** ICON-D2 und ECMWF sind bei einer neuen Instanz zunaechst deaktiviert. Erst nach eigener Wahl und Pruefung der erlaubten API-Nutzung aktivieren; fuer kommerzielle Nutzung ist ein passender API-Zugang noetig.
+
+**Beim Update bereits bestehender Instanzen** werden gespeicherte Werte **nicht** automatisch entfernt. Das ist Absicht, damit Standort, PV-Parameter, Messvariablen und Prognosehistorie erhalten bleiben. Fuer eine vollstaendig leere Konfiguration bitte eine *neue* Instanz erstellen oder die bestehenden Felder bewusst zuruecksetzen; ein Modul-Update ist kein Werksreset.
+
+**Standortwechsel per Karte (ab V1.0.3):** `SelectLocation` ist die in Symcon integrierte Karte (Internetverbindung für die Karte erforderlich). Nach Kartenwahl **„Standort aus Karte übernehmen und Daten ermitteln“** anklicken. Das Modul liest Koordinaten aus der Karte, fragt den Ortsnamen einmalig über OpenStreetMap/Nominatim ab, sucht eine eindeutige DWD-WarnCell-ID im DWD-Katalog (oder verwendet wenige fest verifizierte eindeutige Gebiete), und ermittelt eine **ungefähre** Höhe aus dem nächstgelegenen DWD-MOSMIX-Stationskatalog. MOSMIX wählt seinen Prognosepunkt beim ersten regulären Wetterabruf selbst. **Keine automatische Ermittlung von Dachneigung, Ausrichtung, kWp und Messvariablen** aus einer Karte: diese müssen weiterhin manuell angegeben werden. Bei nicht verfügbarem Online-Dienst oder mehrdeutiger Warnregion bleiben WarnCell-ID und ggf. Ortsname leer; es gibt dann ausdrücklich keine falsche Warnungsentwarnung. Bereits gespeicherte Konfigurationen bleiben beim Update erhalten; erst eine neue Kartenwahl + Button ändert sie. Manuelle Koordinatenkorrekturen sind weiterhin möglich.
+
+**Nominatim-Hinweis:** Standortsuche ist ein **einmaliger nutzerinitiierter Aufruf** (keine Vorschlagslisten/Autocomplete, keine Hintergrundabfragen). Das Modul sendet einen identifizierenden User-Agent, drosselt Serveranfragen auf maximal einmal je Sekunde über eine Sperrdatei und vermeidet systematische Abfragen. Nutzungsbedingungen der öffentlichen Instanz beachten: https://operations.osmfoundation.org/policies/nominatim/ . © OpenStreetMap-Mitwirkende, ODbL. Bei Ausfällen Ortsdaten bitte manuell eintragen.
 
 **PV-Ausrichtung:** +90° = West, 0° = Süd, −90° = Ost (Open-Meteo-Orientierung). Installierte Modulleistung in **kWp**, nicht die Wechselrichtergröße.
 

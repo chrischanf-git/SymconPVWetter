@@ -15,4 +15,6 @@ jobs:
         run: |
           php -r 'foreach (["library.json", "DWDWeather/module.json", "DWDWeather/form.json"] as $file) { json_decode(file_get_contents($file), true, 512, JSON_THROW_ON_ERROR); }'
       - name: Run Symcon mock tests (without network)
-        run: php tests/test_module.php
+        run: |
+          php tests/test_module.php
+          php tests/test_location.php

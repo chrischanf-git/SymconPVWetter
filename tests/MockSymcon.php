@@ -7,6 +7,7 @@ $GLOBALS['mockObjects'] = [];
 $GLOBALS['mockValues'] = [];
 $GLOBALS['mockNextId'] = 10000;
 $GLOBALS['mockLogs'] = [];
+$GLOBALS['mockInstances'] = [];
 
 function fakeNewObject(int $type, int $parent = 0): int
 {
@@ -40,6 +41,14 @@ function IPS_GetObject(int $id): array { return $GLOBALS['mockObjects'][$id]; }
 function IPS_GetVariable(int $id): array { return $GLOBALS['mockObjects'][$id]; }
 function GetValue(int $id): mixed { return $GLOBALS['mockValues'][$id] ?? null; }
 function SetValue(int $id, mixed $value): void { $GLOBALS['mockValues'][$id] = $value; $GLOBALS['mockObjects'][$id]['VariableUpdated'] = time(); }
+function IPS_SetProperty(int $id, string $key, mixed $value): bool {
+    $GLOBALS['mockInstances'][$id]->SetTestProperty($key, $value);
+    return true;
+}
+function IPS_ApplyChanges(int $id): bool {
+    $GLOBALS['mockInstances'][$id]->ApplyChanges();
+    return true;
+}
 function IPS_LogMessage(string $who, string $msg): void { $GLOBALS['mockLogs'][] = [$who,$msg]; }
 function IPS_SemaphoreEnter(string $key, int $timeout): bool { return true; }
 function IPS_SemaphoreLeave(string $key): void {}
@@ -55,6 +64,7 @@ abstract class IPSModuleStrict
     public string $summary='';
     public function __construct(int $id) {
         $this->InstanceID=$id;
+        $GLOBALS['mockInstances'][$id]=$this;
         $GLOBALS['mockObjects'][$id]=['ObjectType'=>1,'ObjectID'=>$id,'ParentID'=>0,'ObjectIdent'=>'', 'VariableType'=>0];
         $this->Create();
         $this->ApplyChanges();
