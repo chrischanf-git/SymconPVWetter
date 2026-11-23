@@ -4,8 +4,7 @@
   "type": 3,
   "vendor": "DWD Wetter PV",
   "aliases": [
-    "DWD Wetter und PV",
-    "DWD MOSMIX Wetter PV"
+    "DWD Wetter und PV"
   ],
   "url": "",
   "parentRequirements": [],
